@@ -34,6 +34,10 @@ class CppTOMLConan(ConanFile):
         source_url = "https://github.com/skystrife/cpptoml"
         tools.get("{0}/archive/{1}.tar.gz".format(source_url, self.version))
         extracted_dir = self.name + "-" + self.version
+        
+        tools.replace_in_file("{0}/CMakeLists.txt".format(extracted_dir),
+            "list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/deps/meta-cmake)",
+            "")
 
         #Rename to "source_subfolder" is a convention to simplify later steps
         os.rename(extracted_dir, self.source_subfolder)
