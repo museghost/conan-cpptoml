@@ -42,7 +42,6 @@ class CppTOMLConan(ConanFile):
         #Rename to "source_subfolder" is a convention to simplify later steps
         os.rename(extracted_dir, self.source_subfolder)
 
-
     def build(self):
         cmake = CMake(self)
         cmake.definitions["CPPTOML_BUILD_EXAMPLES"] = self.options.build_examples
@@ -50,5 +49,9 @@ class CppTOMLConan(ConanFile):
         cmake.build()
         cmake.install()
 
-    def package_info(self):
-        self.cpp_info.libs = tools.collect_libs(self)
+    def package(self):
+        self.copy(pattern="LICENSE", dst="license", src=self.source_subfolder)
+    
+    def package_id(self):
+        self.info.header_only()
+
