@@ -32,17 +32,25 @@ class CppTOMLConan(ConanFile):
 
     def source(self):
         source_url = "https://github.com/skystrife/cpptoml"
-        tools.get("{0}/archive/{1}.tar.gz".format(source_url, self.version))
-        extracted_dir = self.name + "-" + self.version
+        #tools.get("{0}/archive/{1}.tar.gz".format(source_url, self.version))
+        #extracted_dir = self.name + "-" + self.version
+        git = tools.Git(folder=self.source_subfolder)
+        git.clone(source_url, "master")
         
-        tools.replace_in_file("{0}/CMakeLists.txt".format(extracted_dir),
-            "list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/deps/meta-cmake)",
-            "")
+        #tools.replace_in_file("{0}/CMakeLists.txt".format(extracted_dir),
+        #    "list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/deps/meta-cmake)",
+        #    "")
 
         #Rename to "source_subfolder" is a convention to simplify later steps
-        os.rename(extracted_dir, self.source_subfolder)
+        #os.rename(extracted_dir, self.source_subfolder)
+
+        # submodule init
+        self.run("cd {} && git submodule update --init --recursive".format(self.source_subfolder))
 
     def build(self):
+        self.run("cd {src} && git pull && git submodule update --init --recursive".format(src=self.source_subfolder))
+
+        #compilation logic here        
         cmake = CMake(self)
         cmake.definitions["CPPTOML_BUILD_EXAMPLES"] = self.options.build_examples
         cmake.configure(build_folder=self.build_subfolder)
